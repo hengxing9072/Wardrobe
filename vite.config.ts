@@ -10,7 +10,8 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     define: {
       // Replace process.env.API_KEY in the code with the actual value from environment
-      'process.env.API_KEY': "AIzaSyDviM12dfnKxaI49Qi_JXUCagcnxc_eKlo",
+      // Provide an empty string fallback to prevent "undefined" errors
+      'process.env.API_KEY': JSON.stringify(env.VITE_API_KEY || 'AIzaSyDviM12dfnKxaI49Qi_JXUCagcnxc_eKlo'),
       // Prevents "process is not defined" error in browser
       'process.env': {}
     },
