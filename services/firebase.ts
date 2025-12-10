@@ -1,4 +1,4 @@
-import * as firebaseApp from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -11,7 +11,6 @@ import { getFirestore } from "firebase/firestore";
 // 4. Copy the config object below
 // ------------------------------------------------------------------
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCwjW2EKhIL2UtT9auKiEsoZGjm2TBC-Mw",
   authDomain: "my-wardrobe-6f6da.firebaseapp.com",
@@ -23,26 +22,30 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-// We wrap this in a try-catch to prevent the app from crashing entirely if config is missing,
-// allowing the UI to show a helpful message instead.
 let app;
 let auth;
 let db;
 
 try {
-  // Use namespace import to access initializeApp
-  // This resolves issues where TS cannot find the named export in some environments
-  app = firebaseApp.initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
+  // Check if config is dummy/placeholder
+  // We check if the apiKey is the specific placeholder or empty. 
+  // You can remove this specific check if you have pasted your real keys.
+  const isPlaceholder = firebaseConfig.apiKey === "AIzaSyCwjW2EKhIL2UtT9auKiEsoZGjm2TBC-Mw";
+
+  if (!isPlaceholder && firebaseConfig.apiKey) {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+  } else {
+    console.warn("Firebase config appears to be missing or using placeholder values.");
+  }
 } catch (error) {
-  console.error("Firebase initialization failed. Did you add your config in services/firebase.ts?", error);
+  console.error("Firebase initialization failed:", error);
 }
 
 export { auth, db };
+
 export const isFirebaseConfigured = () => {
-  // Check if the user has replaced the default/placeholder key with a real one (or if the placeholder resembles a real key structure but is invalid)
-  // For safety, we just check if it's the specific placeholder string if we had one, but here we assume if it runs, it's configured.
-  // In a real template, we'd check against a specific placeholder string.
-  return true; 
+  // Returns true only if app and auth were successfully initialized
+  return !!app && !!auth;
 };
