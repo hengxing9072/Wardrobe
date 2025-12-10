@@ -1,0 +1,7 @@
+{
+  "name": "Smart Wardrobe",
+  "description": "A visual clothing manager with AI auto-tagging and drag-to-scroll interaction.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
