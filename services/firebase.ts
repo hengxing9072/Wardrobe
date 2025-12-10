@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import * as firebaseApp from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -30,7 +30,8 @@ let auth;
 let db;
 
 try {
-  app = initializeApp(firebaseConfig);
+  // Use namespace import to access initializeApp
+  app = firebaseApp.initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
 } catch (error) {
