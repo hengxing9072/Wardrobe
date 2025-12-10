@@ -25,36 +25,22 @@ const App: React.FC = () => {
   const [isItemsLoading, setIsItemsLoading] = useState(false);
 
   // Check Firebase Config
-  if (!isFirebaseConfigured()) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-        <div className="max-w-lg w-full bg-white p-8 rounded-xl shadow-lg border-l-4 border-amber-500">
-          <h2 className="text-xl font-bold text-slate-800 mb-4">Firebase Setup Required</h2>
-          <p className="text-slate-600 mb-4">
-            To enable cloud storage and login, you need to configure Firebase.
-          </p>
-          <ol className="list-decimal list-inside space-y-2 text-sm text-slate-600 bg-slate-50 p-4 rounded-lg mb-4">
-            <li>Open <code className="bg-slate-200 px-1 rounded">services/firebase.ts</code></li>
-            <li>Replace the placeholder config with your own Firebase project configuration.</li>
-            <li>Save the file.</li>
-          </ol>
-          <p className="text-xs text-slate-400">
-            See the comments in services/firebase.ts for more details.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // This must be checked first to prevent rendering hooks that depend on firebase
+  const configured = isFirebaseConfigured();
 
   // Handle Auth State
   useEffect(() => {
-    if (!auth) return;
+    if (!configured || !auth) {
+      setAuthLoading(false);
+      return;
+    }
+    
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setAuthLoading(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, [configured]);
 
   // Sync Items from Firestore
   useEffect(() => {
@@ -85,6 +71,27 @@ const App: React.FC = () => {
 
     return () => unsubscribe();
   }, [user]);
+
+  if (!configured) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="max-w-lg w-full bg-white p-8 rounded-xl shadow-lg border-l-4 border-amber-500">
+          <h2 className="text-xl font-bold text-slate-800 mb-4">Firebase Setup Required</h2>
+          <p className="text-slate-600 mb-4">
+            To enable cloud storage and login, you need to configure Firebase.
+          </p>
+          <ol className="list-decimal list-inside space-y-2 text-sm text-slate-600 bg-slate-50 p-4 rounded-lg mb-4">
+            <li>Open <code className="bg-slate-200 px-1 rounded">services/firebase.ts</code></li>
+            <li>Replace the placeholder config with your own Firebase project configuration.</li>
+            <li>Save the file.</li>
+          </ol>
+          <p className="text-xs text-slate-400">
+            See the comments in services/firebase.ts for more details.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const handleAddItem = async (newItem: Omit<ClothingItem, 'id' | 'createdAt'>) => {
     if (!user || !db) return;
