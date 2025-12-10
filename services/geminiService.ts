@@ -1,9 +1,20 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// We do NOT initialize the client at the top level anymore.
+// This prevents the entire app from crashing (White Screen) if the API KEY is missing or invalid on startup.
 
 export const generateTagsForImage = async (base64Image: string): Promise<string[]> => {
   try {
+    // Initialize inside the function call
+    const apiKey = process.env.API_KEY;
+    
+    if (!apiKey) {
+      console.warn("Gemini API Key is missing. Skipping AI tagging.");
+      return [];
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+
     // Strip header if present (e.g., "data:image/jpeg;base64,")
     const cleanBase64 = base64Image.split(',')[1] || base64Image;
 
