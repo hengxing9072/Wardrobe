@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import * as firebaseApp from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -30,8 +30,9 @@ let auth;
 let db;
 
 try {
-  // Use named import to access initializeApp
-  app = initializeApp(firebaseConfig);
+  // Use namespace import to access initializeApp
+  // This resolves issues where TS cannot find the named export in some environments
+  app = firebaseApp.initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
 } catch (error) {
